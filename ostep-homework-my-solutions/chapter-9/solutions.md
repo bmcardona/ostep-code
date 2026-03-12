@@ -80,6 +80,7 @@ Options:
             - For random seed 1, the unfairness once the job length reaches 
               1000 is 1903 / 2000 = 0.9515
    - If we were using a stride scheduler instead of a proportional-share 
-     scheduler for Figure 9.2, I would expect, assuming no new jobs are introduced (say) halfway as the jobs are executing, the curve to look more horizontal; i.e., 
+     scheduler for Figure 9.2, assuming no new jobs are introduced (say) halfway 
+     as the jobs are executing, I would expect the curve to look more horizontal; i.e., 
      the level of unfairness would be fairly consistent, irrespective of the 
      job length of both jobs.  
