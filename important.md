@@ -50,3 +50,8 @@
 - KStack (Kernel Stack): Stores temporary register values while the process is still running but has temporarily transitioned to kernel mode.
 - When you see "amortize" in systems/CS writing, just read it as: "make this fixed cost worth it by doing enough work to dwarf it."
     - A good mental image: imagine you pay a $5 toll every time you enter a highway. If you drive 1 mile then exit, that toll is enormous relative to your trip. If you drive 100 miles, the toll barely registers. You've amortized the toll cost over a long drive.
+
+<!-- Chapter 8: SCHEDULING: THE MULTI-LEVEL FEEDBACK QUEUE -->
+- The circumstances where a low-priority job runs without Rule 5 are actually pretty limited:
+    - The high-priority queues happen to be empty (all short/interactive jobs have finished)
+    - A high-priority job blocks (e.g. waiting for I/O), temporarily vacating the queue
