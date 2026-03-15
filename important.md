@@ -94,3 +94,6 @@
 "Dynamic relocation" doesn't mean processes are constantly being moved around in RAM. It just means the capability exists to place or move them anywhere, because the translation is computed live rather than hardcoded. In practice, most context switches involves (among other things) flipping the base register, no copying involved.
 - Base register → physical address (where the process starts in physical RAM)
 - Bounds register → virtual address (the size/limit of the process's virtual address space)
+- Happy to know that other StackOverflow users were just as confused as I was about the difference between address space size and the value of the bounds (limit) register.
+    - See a discussion here: https://stackoverflow.com/questions/63276454/what-is-the-difference-between-address-space-size-and-the-bound-when-using-bas
+    
