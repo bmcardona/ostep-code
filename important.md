@@ -96,4 +96,25 @@
 - Bounds register → virtual address (the size/limit of the process's virtual address space)
 - Happy to know that other StackOverflow users were just as confused as I was about the difference between address space size and the value of the bounds (limit) register.
     - See a discussion here: https://stackoverflow.com/questions/63276454/what-is-the-difference-between-address-space-size-and-the-bound-when-using-bas
-    
+
+<!-- Chapter 16: SEGMENTATION -->
+- offset = virtual address - where segment starts in virtual memory
+- physical address = base + offset
+- "The hardware uses the top two bits (11) to designate the segment, but then we are left with an offset of 3KB."
+    - Here's the math:
+        - 1100 0000 0000 = 1×2^11 + 1×2^10 + 0×2^9 + ... + 0×2^0 = 3072 bytes = 3 KB
+        - (Here, we assume that 1 KB = 1024 bytes)
+- A bit string of all 1's of length n is a binary number that converts to the decimal value 2ⁿ - 1. 
+    - For example, a bit string of all 1's and length 4 ("1111") has a value of 2⁴ - 1 = 16 - 1 = 15.
+- if (segment grows positive):
+    physical address = base + offset        // forward translation
+- else:
+    negative offset = offset - max segment size
+    physical address = base + negative offset  // backward translation
+        - Note that the base is always the start of the segment; so for a stack it would
+        be at the "end" of its segment; as opposed to the "beginning" for the other segments
+- It's possible to have one physical segment in memory mapped to multiple virtual address spaces.
+- With respect to memory allocation algorithms: "The fact that so many different algorithms exist to try to minimize external fragmentation is indicative of a stronger underlying truth: there is no one “best” way to solve the problem."
+- The term "16-byte address space" means the address space contains 16 bytes — i.e., there are 16 addressable locations, each holding 1 byte. It's describing the size/capacity of the space, not the width of the addresses themselves.
+- Recall that virtual address spaces (VAS's) and virtual addresses (VA's) are different concepts!
+    - A virtual address space (VAS) is a contiguous range of memory addresses that the operating system assigns to a process, allowing it to act as if it has a large, private, and contiguous memory space. 
