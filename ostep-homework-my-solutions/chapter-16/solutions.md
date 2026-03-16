@@ -145,7 +145,7 @@ grows in the positive direction, whereas segment 1 in the negative.  -->
 
 <!-- Question 5 -->
 * Can you run the simulator such that no virtual addresses are valid? How?
-    - Sure. Taking the command from question 4, we need only set the base registers of segments 0 and 1 to be 0 and 0, respectively. 
+    - Sure. Using our answer from question 4, we need only set the base registers of segments 0 and 1 to be 0 and 0, respectively. 
     - `python3 segmentation.py -a 128 -p 512 --b0 0 --l0 0 --b1 128 --l1 0 -n 1000 -c`
     - Here, we find that out of 1000 randomly-generated virtual addresses (VA 0–VA 999), 1000 are segmentation violations.
 
