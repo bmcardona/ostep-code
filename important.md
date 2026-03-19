@@ -115,6 +115,70 @@
         be at the "end" of its segment; as opposed to the "beginning" for the other segments
 - It's possible to have one physical segment in memory mapped to multiple virtual address spaces.
 - With respect to memory allocation algorithms: "The fact that so many different algorithms exist to try to minimize external fragmentation is indicative of a stronger underlying truth: there is no one “best” way to solve the problem."
-- The term "16-byte address space" means the address space contains 16 bytes — i.e., there are 16 addressable locations, each holding 1 byte. It's describing the size/capacity of the space, not the width of the addresses themselves.
+- The term "16-byte address space" means the address space contains 16 bytes — i.e., there are 16 addresses, each holding 1 byte. It's describing the capacity of the space, not the "width" of the addresses themselves.
 - Recall that virtual address spaces (VAS's) and virtual addresses (VA's) are different concepts!
     - A virtual address space (VAS) is a contiguous range of memory addresses that the operating system assigns to a process, allowing it to act as if it has a large, private, and contiguous memory space. 
+
+<!-- Chapter 17: FREE-SPACE MANAGEMENT -->
+- A pointer in C is a variable that stores the memory address of another variable, function, or other object in the computer's memory
+- External fragmentation vs. internal fragmentation:
+    - External fragmentation: Waste is in the gaps between allocations (free but unusable)
+    - Internal fragmentation: Waste is within allocations (allocated but unused)
+- Worst-fit distributes the 'pain' of fragmentation across large blocks, keeping leftovers medium-sized, rather than best-fit which creates many unusably small fragments.
+
+<!-- Chapter 18: PAGING: INTRODUCTION -->
+- If the virtual address space of the process is 64 bytes, we need 6 bits total for our virtual address 
+    - Since log2(64) = 6
+- If the virtual address space of the process is 4 GB, we need 32 bits total for our virtual address 
+    - Since 4GB = 4,294,967,296 bytes, and log2(4,294,967,296) = 32
+    - More concisely, if the virtual address space of the process is 4 GB = 4,294,967,296 bytes, we need log2(4,294,967,296) = 32 bits total for our virtual address.
+- *** A pointer is a programming variable that stores a memory address (typically a virtual one), while a virtual address is a logical address within a process's virtual address space ***
+- Good-to-know general formulas:
+    - Offset bits = log₂(page size in bytes)
+    - VPN bits = (total address bits) - (offset bits)
+- *** Page Table: Virtual Page Number --> Physical Frame Number ***
+
+**When executing `movl 21, %eax`, there are two reads from memory:**
+- Read #1: Instruction Fetch
+    - What: Read the instruction bytes movl 21, %eax from memory
+    - Where from: Whatever virtual address the Program Counter is pointing to (e.g., address 1000)
+    - Translation needed: Virtual address 1000 → some physical address
+- Read #2: Explicit Load
+    - What: Read the data value stored at address 21
+    - Where from: Virtual address 21
+    - Translation needed: Virtual address 21 → physical address 117 (in the example)
+
+So the full process is:
+    - Instruction Fetch: CPU reads `movl 21, %eax` from memory (1st memory access)
+    - Decode: CPU figures out what the instruction means
+    - Execute (Explicit load, in this case): CPU reads the data from address 21 (2nd memory access)
+    - Write: CPU puts that data into register eax
+    - Both memory accesses require virtual-to-physical translation (and thus page table lookups), which is why the author was saying page tables can slow things down so much!
+- Assembly code almost exclusively uses virtual addresses when referring to memory in modern operating systems. These addresses are mapped by the CPU's Memory Management Unit (MMU) to actual physical addresses at runtime.
+- Based on the standard binary conversion where 1KB = 1024 bytes, 64 KB is equal to 65,536 bytes 
+- On page 177, note that:
+    - VPN 0: 0 to 1023 bytes
+    - VPN 1: 1024 to 2047 bytes
+    - VPN 2: 2048 to 3071 bytes
+    - ...
+    - More generally, VPN X: (X * 1024) - (X * 1024 + 1023). Hence,
+    - VPN 39: 39936 - 40959
+    - VPN 44: 43008 - 44031
+        - These last two ranges thus show why the virtual pages for virtual addresses
+          40000 to 44000 are VPN=39 ... VPN=44
+- On page 178, the answer to the question "See if you can make sense of the patterns that show up in this visualization. In particular, what will change as the loop continues to run beyond these first five iterations? Which new memory locations will be accessed? Can you figure it out?" is ...
+    - What stays the same as the loop continues:
+            - Instructions (addresses 0x1024, 0x1028, 0x102c, 0x1030):
+            - All 4 instructions remain on VPN 1 → PFN 4
+            - The page table entry for VPN 1 keeps getting accessed repeatedly
+            - The instruction physical addresses keep getting accessed repeatedly
+
+    - What changes as the loop continues:
+        - Array accesses:
+            - Iteration 0: array[0] at virtual address 40000 (VPN 39 → PFN 7)
+            - Iteration 1: array[1] at virtual address 40004 (VPN 39 → PFN 7)
+            - Iteration 2: array[2] at virtual address 40008 (VPN 39 → PFN 7)
+            ...
+            - Iteration 255: array[255] at virtual address 41020 (VPN 40 → PFN 8) <- new page!
+
+
