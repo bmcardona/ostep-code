@@ -181,4 +181,35 @@ So the full process is:
             ...
             - Iteration 255: array[255] at virtual address 41020 (VPN 40 → PFN 8) <- new page!
 
+<!-- Chapter 19: Paging: Faster Translations (TLBs) -->
+- The CPU generates the virtual address (also known as a logical address) while a program is running. The CPU then splits this virtual address into two parts: the Virtual Page Number (VPN) and the page offset.
+- Q: How does the CPU choose the correct page table for a given process?
+    - A:  Processors have a privileged register called the page table base register (PTBR), on x86 it is CR3. On a context switch, the OS changes the value of the PTBR so that the processor now knows which page table to use. In addition to the PTBR, many modern processors have a notion of an address space number (ASN). Processes are given an address space number (from a limited pool) and this ASN is set in a register on a context switch as well. This ASN is used as part of TLB matching and allows TLB entries from multiple address spaces to coexist. Only when an ASN is reused is it necessary to flush the TLB, and then only for entries matching that ASN. Most x86 implementations are more coarse grained than this and there is a notion of global pages (for shared libraries and shared data).
+    - See the following StackOverflow link for more info: https://stackoverflow.com/questions/10880555/how-does-the-system-choose-the-right-page-table
+- Instruction fetch vs. Explicit load/store
+    - `movl 21, %eax`; Load data from address 21 into eax
+    - Two memory accesses happen:
+        - Instruction fetch (implicit): CPU reads the `movl 21, %eax` instruction from wherever it's stored in memory
+        - Explicit load (explicit): CPU reads the data value from address 21 (because that's what the instruction tells it to do)
+            - Side note:
+                - Load = Read from memory
+                - Store = Write to memory
 
+- When the CPU switches to a "new" process (i.e., one that that the CPU has never seen before), the OS creates or loads a unique page table by allocating memory for it in the kernel space, mapping the process's virtual memory to physical frames, and updating the CPU's Page Table Base Register (e.g., CR3 on x86) to point to this new table.
+- Segmentation fault -- Is memory valid?
+- Protection fault -- Is memory accessible?
+- In almost all modern computer architectures (x86, x64, ARM), virtual addresses are byte-addressable, meaning each unique address points to exactly 1 byte (8 bits) of data. While the pointer itself is 4 or 8 bytes long, the memory location it references holds 1 byte.
+    - See more info here: https://stackoverflow.com/questions/37540853/does-memory-address-always-refer-to-one-byte-not-one-bit#:~:text=EX:%20In%20ARM%20cortex%20m4,int%2C%20string%2C%20..)
+- The hardware saves a different PC depending on the trap type:
+    - System call: Save PC (address of next instruction)
+    - TLB miss/page fault: Save PC (address of current instruction; i.e., the one that faulted)
+- A handler is just a function/routine in the OS that gets called when something specific happens
+- When a TLB miss occurs, the OS needs to run code to handle it (look up the page table, load the correct translation into the TLB, etc.). But that handler code itself lives in memory, which means accessing it also requires address translation. If the handler code's translation isn't in the TLB, you get another TLB miss while trying to handle the first TLB miss, which triggers the handler again, causing another miss... infinite loop!
+    - The Solutions:
+        - Keep handlers in physical memory (unmapped): The handler code runs using physical addresses directly, bypassing the TLB entirely. This means no translation is needed, so no TLB lookup happens, so no miss can occur.
+        - "Wire" TLB entries: Reserve some TLB slots that are "permanent" - they never get evicted. Load the handler code's translations into these wired entries at boot time. Now when the OS jumps to the handler, those translations are always in the TLB, guaranteed to hit, so no miss occurs.
+- The operating system generally creates a page table (or a set of page tables) for a process immediately upon its creation to manage its virtual address space.
+- The program counter (PC) is not strictly limited to the data or code segments. While it primarily tracks instructions in the code segment, it can point to any executable region within the entire virtual address space.
+- The CPU continuously changes its own register values millions of times per second as it executes instructions (e.g., loading data, arithmetic operations). While the OS does change registers during context switches (saving/loading process states), the CPU itself modifies them constantly during normal operation.
+- Imagine a carpenter at work. He has a few items in his hands (registers) and then, very close by on his workbench (cache) things he is frequently working on, but not using right this moment, and then in the workshop (main memory) things that pertain to the project at hand but that are not immediately important enough to be on the workbench.
+- Every address within the same page shares the same TLB entry. (This makes sense of course -- VPN literally stands for Virtual Page Number, and each TLB entry only has one VPN and one PFN, in addition to other bits as well.) That's why TLBs are effective —- accessing nearby memory (spatial locality) doesn't thrash the TLB, since those addresses likely fall within the same page
