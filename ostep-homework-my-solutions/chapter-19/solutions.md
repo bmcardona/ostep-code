@@ -32,6 +32,7 @@ Write the program, called tlb.c, that can roughly measure the cost of accessing 
 
 Now write a script in your favorite scripting language (csh, python, etc.) to run this program, while varying the number of pages accessed from 1 up to a few thousand, perhaps incrementing by a factor of two per iteration. Run the script on different machines and gather some data. How many trials are needed to get reliable measurements?
     - I ended up just using a for loop in main() in `tlb.c` to vary the number of pages from 1 to 2 to ... to 2048. I only have one machine (my laptop!), so running on multiple machines is infeasible for now. I found that roughly 1000000 trials for each number of pages worked pretty reliably. 
+    
 ---
 
 ### Question 4
@@ -47,6 +48,7 @@ Next, graph the results, making a graph that looks similar to the one above. Use
 
 One thing to watch out for is compiler optimization. Compilers do all sorts of clever things, including removing loops which increment values that no other part of the program subsequently uses. How can you ensure the compiler does not remove the main loop above from your TLB size estimator?
     - I ended up just adding the `-O0` flag to ensure manually that optimizations were turned off 
+
 ---
 
 ### Question 6
