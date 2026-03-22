@@ -30,7 +30,7 @@
 
 void getCostOfAccessingPage(int num_trials, int num_pages) {
     struct timeval start, end;
-    int page_size = 4096;   // Here, we assume each page has size 4 KB or 4096 bytes
+    int page_size = 4096;   
     int *my_array = malloc(num_pages * page_size);
     int jump = page_size / sizeof(int);
 
