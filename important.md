@@ -213,3 +213,29 @@ So the full process is:
 - The CPU continuously changes its own register values millions of times per second as it executes instructions (e.g., loading data, arithmetic operations). While the OS does change registers during context switches (saving/loading process states), the CPU itself modifies them constantly during normal operation.
 - Imagine a carpenter at work. He has a few items in his hands (registers) and then, very close by on his workbench (cache) things he is frequently working on, but not using right this moment, and then in the workshop (main memory) things that pertain to the project at hand but that are not immediately important enough to be on the workbench.
 - Every address within the same page shares the same TLB entry. (This makes sense of course -- VPN literally stands for Virtual Page Number, and each TLB entry only has one VPN and one PFN, in addition to other bits as well.) That's why TLBs are effective —- accessing nearby memory (spatial locality) doesn't thrash the TLB, since those addresses likely fall within the same page
+
+<!-- Chapter 20: Paging: Smaller Tables -->
+- Internal fragmentation -- waste is internal to the unit of allocation IN PHYSICAL MEMORY
+- External fragmentation -- waste is external to the unit of allocation IN PHYSICAL MEMORY
+- How it works in the hybrid approach:
+    - Instead of:
+        - Base register → start of segment in physical memory
+        - Bounds register → size of segment
+    - You have:
+        - Base register → physical address of the segment's page table
+        - Bounds register → number of valid pages in that segment's page table 
+- Accessing memory outside a logical segment (or the allocated address space) is a classic cause of a segmentation fault.
+- "A page of page-table entries"
+    - The page table itself is just data sitting in memory. That data can be organized into pages, just like any other data.
+    - Example:
+        - Page size = 4 KB
+        - Each PTE = 4 bytes
+        - One page can hold: 4096 / 4 = 1024 PTEs
+    - So "a page of PTEs" means: 1024 consecutive page table entries that happen to fit in one 4 KB page of memory.
+- The page directory either can be used to tell you where a page of the page table is, or that the entire page of the page table contains no valid pages.
+- For an N-level page table:
+    - Total memory accesses = N + 1
+        Where:
+        N accesses = for walking through all N levels of the page table hierarchy
+        +1 access = for fetching the actual data from physical memory
+- 
