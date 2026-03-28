@@ -1,5 +1,3 @@
-# The next workload we examine is called the “80-20” workload, which exhibits locality: 80% of the references are made to 20% of the pages (the “hot” pages); the remaining 20% of the references are made to the re- maining 80% of the pages (the “cold” pages). In our workload, there are a total 100 unique pages again; thus, “hot” pages are referred to most of the time, and “cold” pages the remainder. Figure 22.3 shows how the policies perform with this workload.
-
 # Here, we will mimic the "80-20" workload from the book (see pages 234 and 235). 
     # - Here, 80% of the references are made to 20% of the pages (the “hot” pages); the remaining 20% of the references are made to the re- maining 80% of the pages (the “cold” pages). In our workload, there are a total 100 unique pages again
 
