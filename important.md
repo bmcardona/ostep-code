@@ -238,4 +238,16 @@ So the full process is:
         Where:
         N accesses = for walking through all N levels of the page table hierarchy
         +1 access = for fetching the actual data from physical memory
-- 
+
+<!-- Chapter 21: BEYOND PHYSICAL MEMORY: POLICIES -->
+- The operating system (OS) creates page tables primarily during process creation (e.g., when fork() is called in Unix-like systems). However, modern operating systems often use lazy allocation (demand paging) to optimize memory, meaning the full page table structure might not be created until the process actually accesses a memory page for the first time, triggering a page fault. 
+    - Here is the breakdown of when page tables are created and updated:
+        - Process Initiation: When a new process is created, the kernel creates a new mm_struct (in Linux) and allocates the top-level page table structure (e.g., Page Global Directory).
+        - During exec(): When a binary is executed, the OS maps segments (code, data, stack) and sets up the initial memory mappings, which includes preparing the page table entries (PTEs).
+        - On Demand (Page Faults): In modern OSs, the initial page table entries are often marked as "invalid" or "not present." When the program tries to read/write this memory, it triggers a "page fault." The OS page fault handler then allocates a physical page frame and updates the page table at that moment.
+        - Kernel Bootstrapping: A specialized, separate page table is created by the OS during the initial booting process to map kernel memory.
+        - Context Switch: While not the creation step, the OS must tell the Memory Management Unit (MMU) where the current process's page table is located in physical memory by updating a dedicated register (e.g., CR3 on x86). 
+- In summary, the skeleton is created during process startup, but the actual mappings are usually added lazily during page faults. 
+- Virtual addresses are embedded in a program's compiled binary. **During compilation and linking**, the binary is built assuming a specific virtual address layout, and instructions reference code and data using these virtual addresses. When the program runs, the **operating system** creates the actual virtual address space for the process and sets up page tables. The **MMU hardware** then translates virtual addresses to physical addresses, often lazily allocating physical memory on first access (demand paging).
+    - I.e., the virtual address space is created and mapped to physical memory by the operating system at runtime when a process is started or during its execution. While the executable binary (compiled code) defines the structure, the OS creates the mapping and allocates virtual memory dynamically, allowing each process to have its own private, isolated address space
+    - The main takeaway here is that virtual addresses are assigned during **compile time**, while mappings (VA -> PA) are assigned during **run time**! 
