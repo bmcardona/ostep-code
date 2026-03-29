@@ -239,7 +239,7 @@ So the full process is:
         N accesses = for walking through all N levels of the page table hierarchy
         +1 access = for fetching the actual data from physical memory
 
-<!-- Chapter 21: BEYOND PHYSICAL MEMORY: POLICIES -->
+<!-- Chapter 22: BEYOND PHYSICAL MEMORY: POLICIES -->
 - The operating system (OS) creates page tables primarily during process creation (e.g., when fork() is called in Unix-like systems). However, modern operating systems often use lazy allocation (demand paging) to optimize memory, meaning the full page table structure might not be created until the process actually accesses a memory page for the first time, triggering a page fault. 
     - Here is the breakdown of when page tables are created and updated:
         - Process Initiation: When a new process is created, the kernel creates a new mm_struct (in Linux) and allocates the top-level page table structure (e.g., Page Global Directory).
@@ -251,3 +251,7 @@ So the full process is:
 - Virtual addresses are embedded in a program's compiled binary. **During compilation and linking**, the binary is built assuming a specific virtual address layout, and instructions reference code and data using these virtual addresses. When the program runs, the **operating system** creates the actual virtual address space for the process and sets up page tables. The **MMU hardware** then translates virtual addresses to physical addresses, often lazily allocating physical memory on first access (demand paging).
     - I.e., the virtual address space is created and mapped to physical memory by the operating system at runtime when a process is started or during its execution. While the executable binary (compiled code) defines the structure, the OS creates the mapping and allocates virtual memory dynamically, allowing each process to have its own private, isolated address space
     - The main takeaway here is that virtual addresses are assigned during **compile time**, while mappings (VA -> PA) are assigned during **run time**! 
+
+<!-- Chapter 25: THE VAX/VMS VIRTUAL MEMORY SYSTEM -->
+- A NULL pointer stores the virtual memory address 0. (More precisely: it stores the value 0, which is interpreted as virtual memory address 0 when you dereference it.) When you dereference it, the CPU tries to access virtual memory address 0, which causes a segfault because that page is unmapped.
+- The working set of a program is the set of memory pages (portions of code and data) currently loaded into physical RAM that a process is actively and frequently using.
