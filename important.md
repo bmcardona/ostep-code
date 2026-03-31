@@ -270,4 +270,42 @@ So the full process is:
 - Concurrency vs. Parallelism
     - Concurrency: Appears simultaneous (at least from the perspective of say a process or a thread)
     - Parallelism: Actually simultaneous
-- 
+
+<!-- Chapter 27: Interlude: Thread API -->
+- A pointer to a __ is a variable that holds the virtual address of another variable of type __. 
+    - Here, __ could be any data type; e.g., int, char, float, etc.
+- pthread_join needs to write a pointer into your variable. To write into a variable, you need its address.
+    myret_t *m;                    // m is a pointer
+    Pthread_join(p, (void **) &m); // Pass address of m so pthread_join can write into it
+
+    m has type myret_t*
+    &m has type myret_t** (address of a pointer)
+    Cast to void** to match pthread_join's signature
+
+    Analogy:
+    void set_int(int *ptr) { *ptr = 42; }
+    int x;
+    set_int(&x);  // Pass &x so function can write into x
+- int x = 100;        // Store 100 in an int
+- void *p = (void *) 100;  // Store 100 in a pointer
+- Dot vs Arrow
+    - It depends on whether you have a struct or a pointer to a struct:
+        myret_t r;     // r is a STRUCT
+        r.x = 1;       // Use DOT (.)
+
+        myret_t *r;    // r is a POINTER to a struct  
+        r->x = 1;      // Use ARROW (->)
+- The authors of OSTEP typically initialize a lock using the dynamic way (i.e., at run time), which involves making a call to pthread mutex init(), as follows:
+    - int rc = pthread_mutex_init(&lock, NULL); assert(rc == 0); // always check success!
+        - Note that a corresponding call to pthread cond destroy() should also be made, when you are done with the lock; see the manual page for all of details. 
+- // Use this to keep your code clean but check for failures 
+  // Only use if exiting program is OK upon failure
+    void Pthread_mutex_lock(pthread_mutex_t *mutex) {
+        int rc = pthread_mutex_lock(mutex);
+        assert(rc == 0);
+    }
+- Synchronization primitives are programming tools used to coordinate concurrent threads or processes, preventing data races and ensuring orderly access to shared resources. Key types include mutexes (mutual exclusion), semaphores, condition variables, spinlocks, and atomic operations. They prevent unpredictable behavior by managing thread execution order and signaling.
+- A condition variable is a synchronization primitive that allows threads to wait until a specific condition becomes true, efficiently putting them to sleep without consuming CPU resources. 
+- To compile them, you must include the header pthread.h in your code. On the link line, you must also explicitly link with the pthreads library, by adding the -pthread flag.
+- To compile a simple multi-threaded program, include the header pthread.h in your code, and include the `-pthread` flag to your command:
+    - `gcc -o main main.c -Wall -pthread`
