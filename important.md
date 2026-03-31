@@ -255,3 +255,19 @@ So the full process is:
 <!-- Chapter 25: THE VAX/VMS VIRTUAL MEMORY SYSTEM -->
 - A NULL pointer stores the virtual memory address 0. (More precisely: it stores the value 0, which is interpreted as virtual memory address 0 when you dereference it.) When you dereference it, the CPU tries to access virtual memory address 0, which causes a segfault because that page is unmapped.
 - The working set of a program is the set of memory pages (portions of code and data) currently loaded into physical RAM that a process is actively and frequently using.
+
+
+<!-- Chapter 26: Concurrency: An Introduction -->
+- Shared Between Threads
+    Code (text segment)
+    Heap
+    Global/static data
+    Open files
+- NOT Shared (Per-Thread)
+    Stack (each thread has its own stack)
+    Registers (including program counter, stack pointer)
+- The fetch-decode-execute cycle is the fundamental 3-step operation of a CPU, running continuously from boot-up to shutdown to process instructions. It fetches instructions from memory, decodes what action is needed, and executes that action, repeating this process billions of times per second. 
+- Concurrency vs. Parallelism
+    - Concurrency: Appears simultaneous (at least from the perspective of say a process or a thread)
+    - Parallelism: Actually simultaneous
+- 
